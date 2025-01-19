@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do App</title>
+</head>
+<body>        
+    <form id = "form1">
+        <input id = "addTask" name = "addTask" placeholder = "Write Task..." required />
+        <button type = "submit" id = "addTaskBtn">Add Task</button>
+    </form>
+    <br/>
+
+    <form id = "form2">
+        <input id = "id" name = "id" placeholder = "Enter Task ID..." required />
+        <button type = "submit" id = "deleteBtn">Delete Task</button> 
+    </form>
+
+    <br/>     <br/>
+
+   
+    <form id = "form3">
+        <input id = "updateDelete" name = "updateDelete" placeholder = "Enter Task ID..." required />
+        <input id = "taskUpdated" name = "taskUpdated" placeholder = "Edit Task..." required />
+        <button type = "submit" id = "updateBtn">Update Task</button> 
+    </form>
+   
+    <br/>     <br/>
+
+    <button id = "outputBtn">Show Tasks</button>
+
+    <br/>
+
+    <ul></ul>
+</body>
+<script>
+
+const outputBtn = document.querySelector('#outputBtn');
+const addTaskBtn = document.querySelector('#addTaskBtn');
+const deleteBtn = document.querySelector('#deleteBtn');
+const updateBtn = document.querySelector('#updateBtn');
+
+
+outputBtn.addEventListener('click', showTasks);
+addTaskBtn.addEventListener('click', addTask);
+deleteBtn.addEventListener('click', deleteTask);
+updateBtn.addEventListener('click', updateTask);
+
+//get request
+async function showTasks() {
+      const  response =  await fetch('http://localhost:3000/api/tasks');
+   
+     //console.log(response); 
+     //console.log(response.json());
+
+      const tasks = await response.json();
+      const ul =  document.querySelector('ul');
+      ul.innerHTML = '';
+
+      tasks.forEach((task) => {
+
+        const li =  document.createElement('li');
+
+        li.textContent = `ID: ${task.id} ${task.task}`;
+
+        ul.appendChild(li);
+
+      });
+}
+
+//post request 
+async function addTask(e){
+e.preventDefault();
+
+const form = document.querySelector('#form1');
+
+const formObj = new FormData(form);
+
+for(item of formObj) {
+    console.log(item);
+}
+
+const task = formObj.get('addTask');
+
+const response = await fetch('http://localhost:3000/api/tasks/', {
+    method : "POST", 
+    headers : {'Content-Type': 'application/json'} , 
+    body: JSON.stringify({task})
+})
+
+showTasks(await response.json());
+
+}
+
+//delete request 
+
+async function deleteTask(e){
+  
+    e.preventDefault();
+
+    const form = document.querySelector('#form2');
+
+    //const formObj = new FormData(form);
+
+   // const id = formObj.get('id');
+
+
+    const id = document.getElementById('id').value; 
+
+    const response = await fetch(`http://localhost:3000/api/tasks/${id}`, {
+        method : "DELETE", 
+        headers : {'Content-Type': 'application/json'} , 
+        //body: JSON.stringify({id})
+    });
+
+    showTasks(await response.json());
+
+}
+
+
+async function updateTask(e){
+    e.preventDefault();
+
+
+    const id = document.getElementById("updateDelete").value;
+    const task = document.getElementById("taskUpdated").value;
+
+    const response = await fetch(`http://localhost:3000/api/tasks/${id}`, {
+        method : "PUT", 
+        headers : {'Content-Type': 'application/json'},
+        body: JSON.stringify({task})
+    });
+
+    showTasks(await response.json());
+
+
+}
+</script>
+
+<!--
+Mistakes ive made or things I kept forgetting 
+1. I would forget to add a slash in front of the path so 'api/tasks/:id' instead of '/api/tasks/:id'.
+2. I would forget to change the request type. I would be working on a put request but still have app.get instead of app.put. 
+3. I would forget to add e.preventDefault(); which would cause the page to reload every time i clicked the button. 
+4. I would forget to get the value instead of the box. So doing this     
+const id = document.getElementById("updateDelete").value;
+instead of this const id = document.getElementById("updateDelete").value;
+5. I would forget to add app.use(express.json()); so that express can actually parse (read) the JSON by turning it from string to object in the server here req.body.task. 
+6. Not putting await with fetch requests and when getting the response.json().
+-->
+</html>
