@@ -1,6 +1,10 @@
 let tasks = [
     {id: 1, task: 'clean room'},
-    {id: 2, task: 'do homework'}
+    {id: 2, task: 'do homework'},
+    {id: 3, task: 'clean bathroom'},
+    {id: 4, task: 'dust'},
+    {id: 5, task: 'wash dishes'},
+
 ]
 
 const getTasks = (req, res) => {
@@ -55,7 +59,6 @@ const updateTask =  (req, res) => {
     return res.status(200).json(tasks);
   
 }
-
 
 module.exports = {
     getTasks,
